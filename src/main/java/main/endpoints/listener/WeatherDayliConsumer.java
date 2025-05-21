@@ -1,6 +1,7 @@
 package main.endpoints.listener;
 
 import main.TelegramBot;
+import main.dto.DayliWeatherSummaryDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,13 @@ public class WeatherDayliConsumer {
     }
 
     @RabbitListener(queues = "avarage-temp-queue")
-    public void receiveMessage(Object message) {
-        System.out.println("Получено из RabbitMQ: " + message);
-        telegramBot.sendNotification("Уведомление:\n" + message);
+    public void receiveMessage(DayliWeatherSummaryDto dto) {
+        System.out.println("Получено из RabbitMQ: " + dto);
+
+        String messageForTelegram = "Температура в городе " + dto.cityName()
+                + "в среднем за сегодня была "+ dto.avgTemp() + " Максимальная температура: "
+                + dto.minTemp() + "максимальная температура: " + dto.maxTemp();
+
+        telegramBot.sendNotification("Уведомление:\n" + messageForTelegram);
     }
 }
